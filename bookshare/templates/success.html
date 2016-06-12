@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <p>Successfully logged in</p>
+{{ user.user.username }}
+{{ user.user.password }}
+{{ user.extra }}
 {% endblock %}
