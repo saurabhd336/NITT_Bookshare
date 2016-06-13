@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 
 def index(request):
 	return render(request, 'index.html')
@@ -12,9 +11,23 @@ def signin(request):
 		roll_no = request.POST.get("roll_no")
 		password = request.POST.get("pass")
 		student = authenticate(username = roll_no, password = password)
-		return render(request, 'success.html', {'student' : student})
+		if student != None:
+			student.user.backend = 'django.contrib.auth.backends.ModelBackend'
+			login(request, student.user)
+			return render(request, 'success.html')
+		else:
+			return render(request, 'signin.html', 
+				{'error' : "Invalid credentials or webmail is down. Please try again"})
 	return render(request, 'signin.html')
 
-@login_required(login_url = "/signin/")
+def logout_view(request):
+	if request.user.is_authenticated():
+		logout(request)
+	return HttpResponse("You are logged out")
+
+
 def test(request):
-	return HttpResponse("This is test")
+	if request.user.is_authenticated():
+		return HttpResponse("This is test")
+	return HttpResponse("This is not test")
+	
